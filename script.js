@@ -1,10 +1,11 @@
-function memoize(callback, resolver = JSON.stringify) {
+function memoize(callback, resolver) {
   const cache = new Map();
 
   function getKey(args) {
-    return resolver === JSON.stringify
-      ? JSON.stringify(args)
-      : resolver(...args);
+    if (resolver) {
+      return resolver(...args);
+    }
+    return JSON.stringify(args);
   }
 
   function memoized(...args) {
@@ -24,13 +25,11 @@ function memoize(callback, resolver = JSON.stringify) {
   };
 
   memoized.delete = function (...args) {
-    const key = getKey(args);
-    return cache.delete(key);
+    return cache.delete(getKey(args));
   };
 
   memoized.has = function (...args) {
-    const key = getKey(args);
-    return cache.has(key);
+    return cache.has(getKey(args));
   };
 
   return memoized;
